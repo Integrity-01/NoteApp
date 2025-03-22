@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📝 Notes App</title>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(45deg, #027431, #2cf16e);
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      textarea {
+        width: 95%;
+        height: 100px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        font-size: 16px;
+      }
+      .buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .save-btn {
+        background: #ee0303;
+        color: white;
+      }
+      .save-btn:hover {
+        background: #ee0303;
+      }
+      .clear-btn {
+        background: #ccc;
+        color: black;
+      }
+      .clear-btn:hover {
+        background: #999;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 15px;
+      }
+      li {
+        background: #f9f9f9;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .edit,
+      .delete {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 5px;
+      }
+      .edit {
+        color: #007bff;
+      }
+      .delete {
+        color: red;
+      }
+      @media (max-width: 600px) {
+        .container {
+          width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📝 My Notes</h1>
+      <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+      <div class="buttons">
+        <button class="save-btn" onclick="saveNote()">💾 Save Note</button>
+        <button class="clear-btn" onclick="clearNotes()">🗑 Clear All</button>
+      </div>
+      <ul id="notesList"></ul>
+    </div>
+
+    <script>
+      function saveNote() {
+        let noteInput = document.getElementById("noteInput");
+        let noteText = noteInput.value.trim();
+        if (noteText === "")
+          return alert("Please write something before saving!");
+
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.push(noteText);
+        localStorage.setItem("notes", JSON.stringify(notes));
+
+        noteInput.value = ""; // Clear input
+        displayNotes();
+      }
+
+      function displayNotes() {
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        let notesList = document.getElementById("notesList");
+        notesList.innerHTML = notes
+          .map(
+            (note, index) => `
+                    <li>
+                        <span>${note}</span>
+                        <div>
+                            <button class="edit" onclick="editNote(${index})">✏️</button>
+                            <button class="delete" onclick="deleteNote(${index})">🗑</button>
+                        </div>
+                    </li>
+                `
+          )
+          .join("");
+      }
+
+      function deleteNote(index) {
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.splice(index, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
+        displayNotes();
+      }
+
+      function editNote(index) {
+        let notes = JSON.parse(localStorage.getItem("notes")) || [];
+        let newNote = prompt("Edit your note:", notes[index]);
+        if (newNote !== null) {
+          notes[index] = newNote;
+          localStorage.setItem("notes", JSON.stringify(notes));
+          displayNotes();
+        }
+      }
+
+      function clearNotes() {
+        if (confirm("Are you sure you want to delete all notes?")) {
+          localStorage.removeItem("notes");
+          displayNotes();
+        }
+      }
+
+      displayNotes();
+    </script>
+  </body>
+</html>
